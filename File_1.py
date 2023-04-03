@@ -105,7 +105,7 @@ class App(customtkinter.CTk):
 
         self.slider_3.bind(" <B1-Motion>", self.update_textbox1)
         self.slider_4.bind(" <B1-Motion>", self.update_textbox2)
-
+        #Hello
 
 
 
