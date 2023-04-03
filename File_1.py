@@ -7,14 +7,15 @@ from PIL import ImageTk, Image
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import rpiopiozero
-# import RPi.GPIO as GPIO
-# import time
-# GPIO.setmode(GPIO.BOARD)
-# GPIO.setwarnings(False)
-# channel = 12
-# GPIO.setup(channel,GPIO.OUT)
-# GPIO.output(channel, GPIO.LOW)        # set RPI_PIN LOW to at the start
+import gpiozero
+import RPi.GPIO as GPIO
+import time
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+channel = 12
+GPIO.setup(channel,GPIO.OUT)
+GPIO.output(channel, GPIO.LOW)  
+pwm= GPIO.PWM(12,1)      # set RPI_PIN LOW to at the start
 
 
 customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
@@ -86,16 +87,18 @@ class App(customtkinter.CTk):
         self.textbox1.place(y=90, x=60)
         self.textbox2 = customtkinter.CTkTextbox(self.man_cont_frame.tab("Automatic control"), height=20, width=50)
         self.textbox2.place(y=90, x=180)
-        self.checkbox = customtkinter.CTkCheckBox(self.man_cont_frame.tab("Automatic control"), text="CTkCheckBox", command= self.checkbox_event,
-        variable= self.check_var, onvalue="on", offvalue="off")
-        self.checkbox.place(x=30, y=250)
-        self.ent = customtkinter.CTkEntry(master=self.man_cont_frame.tab("Automatic control"),placeholder_text="Time",width=120,height=25,border_width=2,corner_radius=10)
-        self.ent.place(y=290, x=30)
-        self.start = customtkinter.CTkButton(master=self.man_cont_frame.tab("Automatic control"),width=110,height=25,border_width=0,corner_radius=8,text="Start")
+        #self.checkbox = customtkinter.CTkCheckBox(self.man_cont_frame.tab("Automatic control"), text="CTkCheckBox", command= self.checkbox_event,
+        #variable= self.check_var, onvalue="on", offvalue="off")
+        #self.checkbox.place(x=30, y=250)
+        self.Ti_me = customtkinter.CTkEntry(master=self.man_cont_frame.tab("Automatic control"),placeholder_text="Time",width=100,height=25,border_width=2,corner_radius=10)
+        self.Ti_me.place(y=290, x=10)
+        self.delay = customtkinter.CTkEntry(master=self.man_cont_frame.tab("Automatic control"),placeholder_text="delay",width=100,height=25,border_width=2,corner_radius=10)
+        self.delay.place(y=290, x=120)
+        self.start = customtkinter.CTkButton(master=self.man_cont_frame.tab("Automatic control"),width=110,height=25,border_width=0,corner_radius=8,text="Start",command = self.setpwm)
         self.start.place(y=340, x=5)
         self.resume = customtkinter.CTkButton(master=self.man_cont_frame.tab("Automatic control"), width=110, height=25,border_width=0, corner_radius=8, text="Resume")
         self.resume.place(y=340, x=125)
-        self.stop = customtkinter.CTkButton(master=self.man_cont_frame.tab("Automatic control"), width=110, height=25,border_width=0, corner_radius=8, text="Stop")
+        self.stop = customtkinter.CTkButton(master=self.man_cont_frame.tab("Automatic control"), width=110, height=25,border_width=0, corner_radius=8, text="Stop",command = self.destroy_pwm)
         self.stop.place(y=380, x=5)
         self.pause = customtkinter.CTkButton(master=self.man_cont_frame.tab("Automatic control"), width=110, height=25,border_width=0, corner_radius=8, text="Pause")
         self.pause.place(y=380, x=125)
@@ -265,43 +268,35 @@ class App(customtkinter.CTk):
         
     def turn_on_1(self):
         print(1)
-        # if self.var.get() == 1:
-        #         GPIO.output(channel,True)
-        #         print("On")
-        #
-        # if self.var.get() == 0:
-        #         GPIO.output(channel,False)
-        #         print("Off")
-    #
+        if self.var.get() == 1:
+                GPIO.output(channel,True)
+                print("On")
+        
+        if self.var.get() == 0:
+                GPIO.output(channel,False)
+                print("Off")
+    
     def setpwm(self):
+        pwm.start(0)
+        
+        pwm.ChangeFrequency(int(self.slider_3.get()))
+        pwm.ChangeDutyCycle(int(self.slider_4.get())) 
 
-
-    #
-    #     freq = self.entry.get()
-    #     time = self.entry1.get()
-    #     dutycycle = self.entry2.get()
-    #
-    #     self.pwmobj = GPIO.PWM(channel, freq)  # Initialise instance and set Frequency
-    #     self.pwmobj.start(0)
-    #     self.pwmobj.ChangeDutyCycle(dutycycle)  # Set PWM Duty Cycle
-    #     time.sleep(time)bo
-    #
-    #     self.destroy_pwm()
-    #
     def destroy_pwm(self):
-        pass
+        pwm.stop()
 
     def update_textbox1(self,event):
         self.textbox1.delete("1.0", customtkinter.END)
         self.textbox1.insert(customtkinter.END, "{0}".format(self.slider_3.get()))
+        pwm.ChangeFrequency(int(self.slider_3.get()))
 
     def update_textbox2(self,event):
         self.textbox2.delete("1.0", customtkinter.END)
         self.textbox2.insert(customtkinter.END, "{0}".format(self.slider_4.get()))
+        pwm.ChangeDutyCycle(int(self.slider_4.get())) 
 
     def checkbox_event(self):
-
-        print("checkbox toggled, current value:", self.check_var.get())
+      pass
 
 
 
