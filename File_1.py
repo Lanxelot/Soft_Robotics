@@ -172,7 +172,6 @@ class App(customtkinter.CTk):
         # Valve diag
         # Press Reg diag
 
-    54BC-3608
 
 
 
