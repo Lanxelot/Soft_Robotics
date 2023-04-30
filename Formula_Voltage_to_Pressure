@@ -1,0 +1,1 @@
+Press = ((Vout - 0.5)*10)/4 //  ((Vout -0.10*Vss)*((Pmax-Pmin)/0.8*Vss)) + Pmin
